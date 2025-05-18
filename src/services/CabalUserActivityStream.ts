@@ -1,29 +1,28 @@
-import { EventEmitter } from 'events';
 import { createGRPCCabalClient } from './cabal';
 import { UserResponse } from './cabal/CabalRpc/cabal_pb';
 import { ConnectError } from '@connectrpc/connect';
+import { CabalConfig } from './cabalEnums';
 
-export enum CabalServiceMessages {
+export enum CabalUserActivityStreamMessages {
   userActivityConnected = 'userActivityConnected',
   userActivityDisconnected = 'userActivityDisconnected',
 
+  streamMessage = 'streamMessage',
+
   userActivityPong = 'userActivityPong',
+  userActivityError = 'userActivityError',
 }
 
-enum CabalConfig {
-  pingUserInterval = 8000,
-}
-
-type MessageHandler = (
-  message: CabalServiceMessages,
-  ...args: unknown[]
+export type CabalUserActivityMessageHandler = (
+  message: CabalUserActivityStreamMessages,
+  messagePayload?: unknown,
 ) => void;
 
 class CabalUserActivityStream {
   client: ReturnType<typeof createGRPCCabalClient>;
   userActivityStream: AsyncIterable<UserResponse> | undefined;
   reconnect: boolean = false;
-  private onMessage: MessageHandler;
+  private onMessage: CabalUserActivityMessageHandler;
   private pingUserTimeout: number | undefined;
   private isPinging = false;
 
@@ -32,7 +31,7 @@ class CabalUserActivityStream {
     onMessage,
   }: {
     client: ReturnType<typeof createGRPCCabalClient>;
-    onMessage: MessageHandler;
+    onMessage: CabalUserActivityMessageHandler;
   }) {
     this.client = client;
     this.onMessage = onMessage;
@@ -53,7 +52,7 @@ class CabalUserActivityStream {
   async connectUserActivityUni() {
     try {
       this.userActivityStream = this.client.userActivityUni({});
-      this.onMessage(CabalServiceMessages.userActivityConnected);
+      this.onMessage(CabalUserActivityStreamMessages.userActivityConnected);
       setTimeout(() => this.pingUser(), 0);
     } catch (error) {
       console.log('Error while connecting to [userActivityUni]');
@@ -68,35 +67,11 @@ class CabalUserActivityStream {
     try {
       for await (const response of this.userActivityStream) {
         console.log('UA', response);
-        this.handleUserActivityMessage(response);
+        this.onMessage(CabalUserActivityStreamMessages.streamMessage, response);
       }
-    } catch (err) {
-      console.error('Stream error:', err);
-      this.emit('error', err);
-    }
-  }
-
-  handleUserActivityMessage(message: UserResponse) {
-    const messageCase = message.userResponseKind.case;
-    switch (messageCase) {
-      case 'tradeStatus':
-        break;
-      case 'tradeStats':
-        break;
-      case 'txnCb':
-        break;
-      case 'ping':
-        break;
-      case 'pong':
-        console.log('UA PONG', message.userResponseKind.value);
-        this.emit(CabalServiceMessages.userActivityPong, {
-          count: message.userResponseKind.value,
-        });
-        break;
-      default:
-        console.log(
-          `[handleUserActivityMessage]: unknown case message: ${messageCase}`,
-        );
+    } catch (error) {
+      console.error('Stream error:', error);
+      this.onMessage(CabalUserActivityStreamMessages.userActivityError, error);
     }
   }
 
@@ -119,7 +94,9 @@ class CabalUserActivityStream {
     } catch (error) {
       console.error('Ping error:', error);
       if (error instanceof ConnectError) {
-        this.emit(CabalServiceMessages.userActivityDisconnected);
+        this.onMessage(
+          CabalUserActivityStreamMessages.userActivityDisconnected,
+        );
         if (this.reconnect) {
           console.error('reconnecting');
           this.connectUserActivityUni();

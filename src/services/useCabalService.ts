@@ -1,7 +1,8 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { userSettings } from '../stores/userSettings';
-import CabalService, { CabalServiceMessages } from '../services/CabalService';
+import CabalService from '../services/CabalService';
 import { setCabalUserActivity } from '../stores/cabalUserActivity';
+import { CabalUserActivityStreamMessages } from './CabalUserActivityStream';
 
 let cabal: CabalService | null = null;
 const config = {
@@ -30,12 +31,12 @@ export function useCabalService() {
       };
 
       cabal.on(
-        CabalServiceMessages.userActivityConnected,
+        CabalUserActivityStreamMessages.userActivityConnected,
         handleUserActivityConnected,
       );
 
       cabal.on(
-        CabalServiceMessages.userActivityDisconnected,
+        CabalUserActivityStreamMessages.userActivityDisconnected,
         handleUserActivityDisconnected,
       );
 
@@ -44,7 +45,7 @@ export function useCabalService() {
 
       onCleanup(() => {
         cabal?.off(
-          CabalServiceMessages.userActivityConnected,
+          CabalUserActivityStreamMessages.userActivityConnected,
           handleUserActivityConnected,
         );
         cabal?.stop?.();
