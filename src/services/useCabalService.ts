@@ -5,8 +5,8 @@ import { setCabalUserActivity } from '../stores/cabalUserActivity';
 import { CabalUserActivityStreamMessages } from './CabalUserActivityStream';
 
 let cabal: CabalService | null = null;
+
 const config = {
-  // apiKey: '427P1H3rc68obQQfoUPYA8Gw16qR81v7AMoAJaRkkA7C',
   apiUrl: 'https://cabalbot.tech:11111',
 };
 
