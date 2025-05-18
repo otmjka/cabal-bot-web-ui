@@ -1,6 +1,10 @@
 import { EventEmitter } from 'events';
 import { createGRPCCabalClient } from './cabal';
-import { UserResponse, TradeEventResponse } from './cabal/CabalRpc/cabal_pb';
+import {
+  UserResponse,
+  TradeEventResponse,
+  TradeResponse,
+} from './cabal/CabalRpc/cabal_pb';
 
 import CabalUserActivityStream, {
   CabalUserActivityMessageHandler,
@@ -15,7 +19,7 @@ import CabalTradeStream, {
 class CabalService extends EventEmitter {
   client: ReturnType<typeof createGRPCCabalClient>;
   userActivityStream: CabalUserActivityStream;
-  userTradesStream: CabalTradeStream;
+  tradesStream: CabalTradeStream;
 
   constructor({ apiKey, apiUrl }: { apiKey: string; apiUrl: string }) {
     super();
@@ -33,7 +37,7 @@ class CabalService extends EventEmitter {
 
     this.handleTradeMessage = this.handleTradeMessage.bind(this);
 
-    this.userTradesStream = new CabalTradeStream({
+    this.tradesStream = new CabalTradeStream({
       client: this.client,
       onMessage: this.handleTradeMessage,
     });
@@ -41,13 +45,46 @@ class CabalService extends EventEmitter {
 
   start() {
     this.userActivityStream.start();
-    setTimeout(() => this.userTradesStream.start(), 10);
+    setTimeout(() => this.tradesStream.start(), 10);
   }
 
   stop() {
     this.userActivityStream.stop();
-    this.userTradesStream.stop();
+    this.tradesStream.stop();
   }
+
+  // CabalRpc -> UserPing
+  pingUser() {
+    return this.userActivityStream.pingUser();
+  }
+
+  // CabalRpc -> TradePing
+  pingTrade() {
+    return this.tradesStream.pingTrade();
+  }
+
+  // TODO: https://stackoverflow.com/questions/71200948/how-can-i-validate-a-solana-wallet-address-with-web3js
+  // CabalRpc -> SubscribeToken(TokenTradeEventSub) returns (TradeResponse) {}
+  async subscribeToken(mint: string): Promise<TradeResponse | undefined> {
+    try {
+      const result = await this.client.subscribeToken({
+        mint,
+      });
+      console.log('subscribeToken', result);
+      return result;
+    } catch (error) {
+      console.error('subscribeToken', error);
+    }
+  }
+  // CabalRpc -> MarketSell
+  // CabalRpc -> MarketBuy
+  // CabalRpc -> GetTokenLimitOrders
+  // CabalRpc -> PlaceLimitOrders
+  // CabalRpc -> DeleteLimitOrders
+
+  /* 
+    private 
+  */
 
   handleTradeMessage: CabalTradeMessageHandler = (
     messageType,
@@ -141,10 +178,6 @@ class CabalService extends EventEmitter {
           `[processTradeMessage]: unknown case message: ${messageCase}`,
         );
     }
-  }
-
-  pingUser() {
-    return this.userActivityStream.pingUser();
   }
 }
 

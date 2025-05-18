@@ -21,7 +21,7 @@ export type CabalUserActivityMessageHandler = (
 class CabalUserActivityStream {
   client: ReturnType<typeof createGRPCCabalClient>;
   userActivityStream: AsyncIterable<UserResponse> | undefined;
-  reconnect: boolean = false;
+  reconnect: boolean = true;
   private onMessage: CabalUserActivityMessageHandler;
   private pingUserTimeout: number | undefined;
   private isPinging = false;

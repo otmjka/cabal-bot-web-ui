@@ -1,6 +1,4 @@
 import { Show, type Component } from 'solid-js';
-import { CabalProvider } from './CabalContext';
-import { StreamDisplay } from './StreamDisplay';
 import Greeting from './Greeting';
 import { UserSettings } from './UserSettings';
 
@@ -19,14 +17,7 @@ const App: Component = () => {
       <Card />
       <Show when={userSettings.apiKey} fallback={<UserSettings />}>
         <div>!!!</div>
-        {/* <CabalProvider
-          apiKey={userSettings.apiKey as string}
-          apiUrl={config.apiUrl}
-        >
-          <StreamDisplay />
-        </CabalProvider> */}
       </Show>
-      {/* <TradingViewChart /> */}
     </div>
   );
 };

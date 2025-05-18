@@ -22,7 +22,7 @@ export type CabalTradeMessageHandler = (
 class CabalTradeStream {
   client: ReturnType<typeof createGRPCCabalClient>;
   tradesStream: AsyncIterable<TradeEventResponse> | undefined;
-  reconnect: boolean = false;
+  reconnect: boolean = true;
   private onMessage: CabalTradeMessageHandler;
   private pingUserTimeout: number | undefined;
   private isPinging = false;
