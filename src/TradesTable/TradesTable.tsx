@@ -6,21 +6,21 @@ import {
   createSolidTable,
 } from '@tanstack/solid-table';
 
-import { trades } from '../stores/trades';
-import { columns } from './columns';
+import { tradeEventsStore } from '../stores/tradeEventsStore';
 import { tokenTradeStatsStore } from '../stores/tokenTradeStatsStore';
+import { columns } from './columns';
 
 const TradesTable = () => {
   const table = createSolidTable({
     get data() {
-      return [...trades.trades].reverse();
+      return [...tradeEventsStore.trades].reverse();
     },
-    columns,
+    columns: columns(tokenTradeStatsStore.tokenTradeStats?.tokenDecimals || 9),
     getCoreRowModel: getCoreRowModel(),
   });
 
   return (
-    <div class="h-64 overflow-auto border rounded w-[50%]">
+    <div class="h-64 overflow-auto border rounded w">
       <table class="table p-4 bg-white rounded-lg shadow min-w-full table-auto">
         <thead>
           <For each={table.getHeaderGroups()}>
@@ -60,28 +60,7 @@ const TradesTable = () => {
             )}
           </For>
         </tbody>
-        <tfoot>
-          <For each={table.getFooterGroups()}>
-            {(footerGroup) => (
-              <tr>
-                <For each={footerGroup.headers}>
-                  {(header) => (
-                    <th>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.footer,
-                            header.getContext(),
-                          )}
-                    </th>
-                  )}
-                </For>
-              </tr>
-            )}
-          </For>
-        </tfoot>
       </table>
-      <div class="h-4" />
     </div>
   );
 };

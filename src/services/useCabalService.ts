@@ -9,12 +9,11 @@ import {
   TokenTradeStats,
   TradeEvent,
 } from './cabal/CabalRpc/cabal_pb';
-import { addTrade } from '../stores/trades';
-import {
-  addTokenStatus,
-  setTokenStatusStore,
-} from '../stores/tokenStatusStore';
+import { addTrade, setTradeEventsStore } from '../stores/tradeEventsStore';
+import { setTokenStatusStore } from '../stores/tokenStatusStore';
 import { addTokenTradeStats } from '../stores/tokenTradeStatsStore';
+import { UserResponse } from '../types';
+import { setCabalTradeStream } from '../stores/cabalTradeSreamStore';
 
 let cabal: CabalService | null = null;
 
@@ -38,6 +37,18 @@ export function useCabalService() {
         setCabalUserActivity('connected', true);
       };
 
+      const handleUserActivityPong = (eventValue: UserResponse) => {
+        setCabalUserActivity('pong', eventValue.count as { count: bigint });
+      };
+
+      const handleTradeStreamConnected = () => {
+        setCabalTradeStream('connected', true);
+      };
+
+      const handleTradeStreamPong = (eventValue: UserResponse) => {
+        setCabalTradeStream('pong', eventValue.count as { count: bigint });
+      };
+
       const handleUserActivityDisconnected = () => {
         setCabalUserActivity('connected', false);
       };
@@ -58,12 +69,18 @@ export function useCabalService() {
 
       const handleTradeTokenStatus = (eventValue: TokenStatus) => {
         const tokenStatus = eventValue.value.value as TokenStatus;
+        setTradeEventsStore('trades', []);
         setTokenStatusStore('tokenStatus', tokenStatus);
       };
 
       cabal.on(
         CabalUserActivityStreamMessages.userActivityConnected,
         handleUserActivityConnected,
+      );
+
+      cabal.on(
+        CabalUserActivityStreamMessages.userActivityPong,
+        handleUserActivityPong,
       );
 
       cabal.on(
@@ -76,13 +93,28 @@ export function useCabalService() {
         handleUserActivityTradeStats,
       );
 
+      // trade streams
+      cabal.on(
+        CabalTradeStreamMessages.tradeConnected,
+        handleTradeStreamConnected,
+      );
+      cabal.on(CabalTradeStreamMessages.tradePong, handleTradeStreamPong);
       cabal.on(CabalTradeStreamMessages.tradeEvent, handleTradeEvent);
       cabal.on(CabalTradeStreamMessages.tokenStatus, handleTradeTokenStatus);
       cabal.start();
       setCabalInstance(cabal);
 
       onCleanup(() => {
+        cabal?.off(
+          CabalTradeStreamMessages.tradeConnected,
+          handleTradeStreamConnected,
+        );
+        cabal?.off(CabalTradeStreamMessages.tradePong, handleTradeStreamPong);
         cabal?.off(CabalTradeStreamMessages.tradeEvent, handleTradeEvent);
+        cabal?.off(
+          CabalUserActivityStreamMessages.userActivityPong,
+          handleUserActivityPong,
+        );
         cabal?.on(CabalTradeStreamMessages.tokenStatus, handleTradeTokenStatus);
 
         cabal?.off(

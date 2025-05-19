@@ -32,6 +32,7 @@ class CabalService extends EventEmitter {
 
     this.userActivityStream = new CabalUserActivityStream({
       client: this.client,
+      debug: true,
       onMessage: this.handleUserActivityMessage,
     });
 
@@ -39,14 +40,15 @@ class CabalService extends EventEmitter {
 
     this.tradesStream = new CabalTradeStream({
       client: this.client,
+      debug: true,
       onMessage: this.handleTradeMessage,
     });
   }
 
-  start() {
-    this.userActivityStream.start();
+  async start() {
+    await this.userActivityStream.start();
     // TODO: wait for first success pong from userActivity
-    setTimeout(() => this.tradesStream.start(), 200);
+    this.tradesStream.start();
   }
 
   stop() {
@@ -176,9 +178,12 @@ class CabalService extends EventEmitter {
         });
         break;
       case 'ping':
+        debugger;
+        this.emit(CabalTradeStreamMessages.ping, {
+          value: message.tradeEventResponseKind.value,
+        });
         break;
       case 'pong':
-        console.log('TRADE PONG', message.tradeEventResponseKind.value);
         this.emit(CabalTradeStreamMessages.tradePong, {
           count: message.tradeEventResponseKind.value,
         });

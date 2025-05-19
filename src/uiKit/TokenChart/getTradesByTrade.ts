@@ -1,5 +1,5 @@
-import { TradeRecord } from '../../stores/trades';
-import { calculatePrice } from './calculatePrice';
+import { TradeRecord } from '../../stores/tradeEventsStore';
+import { calculatePrice } from '../../utils/ammPrice';
 import { SeriesItem } from './types';
 
 export const getTradesByTrade = ({

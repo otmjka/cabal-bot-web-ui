@@ -18,3 +18,30 @@ start
   listen events (this.listenUserActivity)
 
 ```
+
+---depends of ApiKey
+start of CabalService
+CabalService emit messages
+
+useCabalService
+proxy(broker'ing) all messages to stores
+
+`tradeEventStore` -
+on `CabalTradeStreamMessages.tradeEvent`
+TradeEvent -> TradeRecord
+
+```ts
+type TradesStore = {
+  trades: TradeRecord[];
+};
+```
+
+Subscribers:
+
+Chart
+TradesHistory
+=> currentPrice
+
+## Data Stores
+
+tradeEventsStore

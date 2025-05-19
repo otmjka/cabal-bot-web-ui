@@ -24,13 +24,14 @@ const SubscribeToken = () => {
     }
     setError('');
     subscribeToken(mint());
+    setMint('');
   };
 
   const handleOnInput = (e: Event & { currentTarget: HTMLInputElement }) =>
     setMint(e.currentTarget.value);
 
   return (
-    <Card>
+    <form onSubmit={handleSubmit}>
       <div class="flex">
         <div class="flex flex-1">
           <Input
@@ -41,14 +42,14 @@ const SubscribeToken = () => {
           />
         </div>
         <div class="w-100 pl-4">
-          <Button disabled={!mint()} onClick={handleSubmit}>
+          <Button type="submit" disabled={!mint()}>
             Subscribe
           </Button>
         </div>
       </div>
-      <div class="text-white">7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr</div>
-    </Card>
+    </form>
   );
 };
+// <div class="text-white">7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr</div>
 
 export default SubscribeToken;
