@@ -45,7 +45,12 @@ export function useCabalService() {
       };
 
       const handleTradeEvent = (eventValue: TradeEvent) => {
-        addTrade({ type: eventValue.value.case, data: eventValue.value.value });
+        addTrade({
+          tradeEvent: {
+            value: eventValue.value.value,
+            type: eventValue.value.case,
+          },
+        });
       };
 
       const handleTradeTokenStatus = (eventValue: TokenStatus) => {

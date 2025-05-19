@@ -45,7 +45,8 @@ class CabalService extends EventEmitter {
 
   start() {
     this.userActivityStream.start();
-    setTimeout(() => this.tradesStream.start(), 100);
+    // TODO: wait for first success pong from userActivity
+    setTimeout(() => this.tradesStream.start(), 200);
   }
 
   stop() {

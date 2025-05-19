@@ -1,5 +1,9 @@
 import { createStore } from 'solid-js/store';
-import { TradeEventData } from '../services/cabal/CabalRpc/cabal_pb';
+import {
+  PoolKind,
+  TradeEvent,
+  TradeEventData,
+} from '../services/cabal/CabalRpc/cabal_pb';
 
 type TradeType =
   | 'buy'
@@ -12,7 +16,11 @@ type TradeType =
   | 'burnMint';
 
 export type TradeRecord = {
-  data: TradeEventData;
+  amountSol: bigint;
+  baseLiq: bigint;
+  quoteLiq: bigint;
+  poolKind: PoolKind;
+  timestamp: number;
   type: TradeType;
 };
 
@@ -26,8 +34,30 @@ const initValue = {
 
 const [trades, setTrades] = createStore<TradesStore>(initValue);
 
-const addTrade = (item: TradeRecord) => {
-  setTrades('trades', (prev) => [...prev, item]);
+const addTrade = ({
+  tradeEvent,
+}: {
+  tradeEvent: { value: TradeEventData; type: TradeType };
+}) => {
+  const data = tradeEvent.value;
+  const {
+    amountSol, // : bigint;
+    baseLiq, // : bigint;
+    quoteLiq, // : bigint;
+    poolKind, // : PoolKind;
+  } = data;
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const newItem = {
+    type: tradeEvent.type,
+    timestamp,
+    amountSol,
+    baseLiq,
+    quoteLiq,
+    poolKind,
+  };
+
+  setTrades('trades', (prev) => [...prev, newItem]);
 };
 
 export { trades, setTrades, addTrade };

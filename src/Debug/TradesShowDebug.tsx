@@ -10,17 +10,18 @@ const TradesShowDebug = () => (
           <div class="flex gap-3">
             <div class="whitespace-nowrap">type: {trade.type}</div>
             <div class="whitespace-nowrap">
-              amountSol: {trade.data.amountSol.toString()}
+              amountSol: {trade.amountSol.toString()}
             </div>
             <div class="whitespace-nowrap">
-              baseLiq: {trade.data.baseLiq.toString()}
+              baseLiq: {trade.baseLiq.toString()}
             </div>
             <div class="whitespace-nowrap">
-              poolKind: {PoolKind[trade.data.poolKind]}
+              poolKind: {PoolKind[trade.poolKind]}
             </div>
             <div class="whitespace-nowrap">
-              quoteLiq: {trade.data.quoteLiq.toString()}
+              quoteLiq: {trade.quoteLiq.toString()}
             </div>
+            <div class="whitespace-nowrap">timestamp: {trade.timestamp}</div>
             <hr />
           </div>
         )}
