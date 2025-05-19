@@ -1,7 +1,11 @@
-import { createGRPCCabalClient } from './cabal';
-import { UserResponse } from './cabal/CabalRpc/cabal_pb';
 import { ConnectError } from '@connectrpc/connect';
+
+import { FakeConsole } from '../types';
+import { fakeConsole } from '../utils';
+
+import { createGRPCCabalClient } from './cabal';
 import { CabalConfig } from './cabalEnums';
+import { UserResponse } from './cabal/CabalRpc/cabal_pb';
 
 export enum CabalUserActivityStreamMessages {
   userActivityConnected = 'userActivityConnected',
@@ -9,7 +13,7 @@ export enum CabalUserActivityStreamMessages {
 
   streamMessage = 'streamMessage',
 
-  userActivityPong = 'userActivityPong',
+  userActivityPong = 'pong',
   userActivityError = 'userActivityError',
 
   tradeStats = 'tradeStats',
@@ -27,49 +31,69 @@ class CabalUserActivityStream {
   private onMessage: CabalUserActivityMessageHandler;
   private pingUserTimeout: number | undefined;
   private isPinging = false;
-
+  log: Console | FakeConsole;
+  onePongReceived: Promise<void> | undefined;
+  _resolveOnePong: undefined | (() => void);
   constructor({
     client,
     onMessage,
+    debug = false,
   }: {
     client: ReturnType<typeof createGRPCCabalClient>;
     onMessage: CabalUserActivityMessageHandler;
+    debug?: boolean;
   }) {
+    this.log = debug ? console : fakeConsole;
     this.client = client;
     this.onMessage = onMessage;
   }
 
-  start() {
-    console.log('start cabal service');
-    this.connectUserActivityUni();
-    this.listenUserActivity();
+  async start() {
+    try {
+      this.log.log('start cabal UAStream');
+      this.connectUserActivityUni();
+      this.onePongReceived = new Promise((resolve) => {
+        this._resolveOnePong = resolve;
+      });
+      setTimeout(() => this.listenUserActivity());
+      setTimeout(() => this.pingUser(), 0);
+      await this.onePongReceived;
+      this.onMessage(CabalUserActivityStreamMessages.userActivityConnected);
+    } catch (error) {
+      console.error('UA stream start error', error);
+    }
   }
 
   stop() {
-    console.log('stop cabal service');
+    this.log.log('stop cabal UAStream');
+    this.onePongReceived = undefined;
     this.isPinging = false;
     clearTimeout(this.pingUserTimeout);
   }
 
-  async connectUserActivityUni() {
+  connectUserActivityUni() {
     try {
+      this.log.log('connect UAStream');
       this.userActivityStream = this.client.userActivityUni({});
-      this.onMessage(CabalUserActivityStreamMessages.userActivityConnected);
-      setTimeout(() => this.pingUser(), 0);
     } catch (error) {
-      console.log('Error while connecting to [userActivityUni]');
+      this.userActivityStream = undefined;
+      console.error('Error while connecting to [userActivityUni]');
     }
   }
 
   async listenUserActivity() {
+    this.log.log('start listening UAStream');
     if (!this.userActivityStream) {
       throw new Error('[userActivityUni] stream is undefined');
     }
 
     try {
       for await (const response of this.userActivityStream) {
-        response.userResponseKind.case !== 'pong' &&
-          console.log('UA', response);
+        if (response.userResponseKind.case === 'pong' && this._resolveOnePong) {
+          this._resolveOnePong();
+        }
+        // response.userResponseKind.case !== 'pong' &&
+        this.log.log('UA', response);
         this.onMessage(CabalUserActivityStreamMessages.streamMessage, response);
       }
     } catch (error) {
@@ -79,31 +103,36 @@ class CabalUserActivityStream {
   }
 
   async pingUser() {
+    this.log.log('pingUser');
     this.isPinging = true;
 
     try {
       const count = BigInt(Date.now());
 
-      await this.client.userPing({
+      const pingResult = await this.client.userPing({
         count,
       });
 
-      if (this.isPinging) {
-        this.pingUserTimeout = setTimeout(
-          () => this.pingUser(),
-          CabalConfig.pingUserInterval,
-        );
-      }
+      this.log.log('ping UA Result', pingResult);
     } catch (error) {
       console.error('Ping error:', error);
       if (error instanceof ConnectError) {
+        this.userActivityStream = undefined;
         this.onMessage(
           CabalUserActivityStreamMessages.userActivityDisconnected,
         );
         if (this.reconnect) {
-          console.error('reconnecting');
-          this.connectUserActivityUni();
+          this.log.info('UA reconnecting');
+          setTimeout(() => this.start(), 0);
         }
+      }
+    } finally {
+      this.log.log('UA ping finally', this.isPinging);
+      if (this.isPinging && this.userActivityStream) {
+        this.pingUserTimeout = setTimeout(
+          () => this.pingUser(),
+          CabalConfig.pingUserInterval,
+        );
       }
     }
   }

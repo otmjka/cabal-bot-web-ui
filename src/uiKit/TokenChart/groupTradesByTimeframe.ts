@@ -1,4 +1,4 @@
-import { TradeRecord } from '../../stores/trades';
+import { TradeRecord } from '../../stores/tradeEventsStore';
 import { getGroupsByTimeframe } from './getGroupsByTimeframe';
 import { getTimeFrameSeconds } from './getTimeFrameSeconds';
 import { getTradesByTrade } from './getTradesByTrade';

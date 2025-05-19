@@ -7,7 +7,7 @@ import {
   Show,
 } from 'solid-js';
 import uPlot from 'uplot';
-import { trades as tradeStore } from '../../stores/trades';
+import { tradeEventsStore } from '../../stores/tradeEventsStore';
 import 'uplot/dist/uPlot.min.css';
 import { tokenStatusStore } from '../../stores/tokenStatusStore';
 import { TimeFrames } from './types';
@@ -50,7 +50,7 @@ export default function TokenChart() {
 
   const chartData = createMemo(() =>
     getChartData({
-      trades: tradeStore.trades,
+      trades: tradeEventsStore.trades,
       selectedTimeframe: selectedTimeframe(),
       tokenDecimals,
     }),

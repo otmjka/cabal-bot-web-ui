@@ -1,4 +1,4 @@
-import { TradeRecord } from '../../stores/trades';
+import { TradeRecord } from '../../types';
 import { groupTradesByTimeframe } from './groupTradesByTimeframe';
 import { TimeFrames } from './types';
 

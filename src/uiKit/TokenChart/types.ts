@@ -1,4 +1,4 @@
-import { TradeType } from '../../stores/trades';
+import { TradeType } from '../../types';
 
 export enum TimeFrames {
   single = 'single',

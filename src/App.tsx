@@ -1,46 +1,20 @@
 import { Show, type Component } from 'solid-js';
-import Greeting from './Greeting';
-import { UserSettings } from './UserSettings';
 
+import { useCabalService } from './services/useCabalService';
+import { WelcomeScreen } from './widgets/WelcomeScreen';
+import { AppLayout } from './uiKit/AppLayout';
+import { TokenScreen } from './Token';
 import { userSettings } from './stores/userSettings';
-import { trades } from './stores/trades';
-import { UserActivityOnlineWidger } from './widgets/UserActivityOnlineWidger';
-import { Button } from './uiKit';
-import { useCabalPing, useCabalService } from './services/useCabalService';
-import SubscribeToken from './TokenSpotLight/SubscribeToken';
-import TradesTable from './TradesTable/TradesTable';
-import TradesShowDebug from './Debug/TradesShowDebug';
-import TokenStatusListShowDebug from './Debug/TokenStatusListShowDebug';
-import TokenTradeStatsShowDebug from './Debug/TokenTradeStatsShowDebug';
-import { TokenChart } from './uiKit/TokenChart';
 
 const App: Component = () => {
   useCabalService();
-  const userPing = useCabalPing();
   return (
-    <div class="h-screen">
-      <Greeting />
-      <Button onClick={() => userPing()}>userPing</Button>
-      <SubscribeToken />
-      <UserActivityOnlineWidger />
-      <Show when={userSettings.apiKey} fallback={<UserSettings />}>
-        <div>!!!</div>
+    <AppLayout>
+      <WelcomeScreen />
+      <Show when={!!userSettings.apiKey}>
+        <TokenScreen />
       </Show>
-      <Show when={trades.trades.length > 0}>
-        <TokenChart />
-      </Show>
-
-      <Show when={trades.trades.length > 0}>
-        <TradesTable />
-      </Show>
-      <div class="flex">
-        <TradesShowDebug />
-        <div>
-          <TokenStatusListShowDebug />
-          <TokenTradeStatsShowDebug />
-        </div>
-      </div>
-    </div>
+    </AppLayout>
   );
 };
 
