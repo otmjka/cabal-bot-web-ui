@@ -23,6 +23,7 @@
   "dependencies": {
     "@connectrpc/connect": "^2.0.2",
     "@connectrpc/connect-web": "^2.0.2",
+    "@tanstack/solid-table": "^8.21.3",
     "classnames": "^2.5.1",
     "events": "^3.3.0",
     "lightweight-charts": "^5.0.6",

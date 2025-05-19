@@ -11,6 +11,8 @@ export enum CabalUserActivityStreamMessages {
 
   userActivityPong = 'userActivityPong',
   userActivityError = 'userActivityError',
+
+  tradeStats = 'tradeStats',
 }
 
 export type CabalUserActivityMessageHandler = (
@@ -66,7 +68,8 @@ class CabalUserActivityStream {
 
     try {
       for await (const response of this.userActivityStream) {
-        console.log('UA', response);
+        response.userResponseKind.case !== 'pong' &&
+          console.log('UA', response);
         this.onMessage(CabalUserActivityStreamMessages.streamMessage, response);
       }
     } catch (error) {

@@ -45,7 +45,7 @@ class CabalService extends EventEmitter {
 
   start() {
     this.userActivityStream.start();
-    setTimeout(() => this.tradesStream.start(), 10);
+    setTimeout(() => this.tradesStream.start(), 100);
   }
 
   stop() {
@@ -140,13 +140,16 @@ class CabalService extends EventEmitter {
       case 'tradeStatus':
         break;
       case 'tradeStats':
+        this.emit(
+          CabalUserActivityStreamMessages.tradeStats,
+          message.userResponseKind,
+        );
         break;
       case 'txnCb':
         break;
       case 'ping':
         break;
       case 'pong':
-        console.log('UA PONG', message.userResponseKind.value);
         this.emit(CabalUserActivityStreamMessages.userActivityPong, {
           count: message.userResponseKind.value,
         });
@@ -162,8 +165,14 @@ class CabalService extends EventEmitter {
     const messageCase = message.tradeEventResponseKind.case;
     switch (messageCase) {
       case 'tradeEvent':
+        this.emit(CabalTradeStreamMessages.tradeEvent, {
+          value: message.tradeEventResponseKind.value.tradeEventKind,
+        });
         break;
       case 'tokenStatus':
+        this.emit(CabalTradeStreamMessages.tokenStatus, {
+          value: message.tradeEventResponseKind,
+        });
         break;
       case 'ping':
         break;

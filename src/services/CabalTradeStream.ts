@@ -12,6 +12,9 @@ export enum CabalTradeStreamMessages {
 
   tradePong = 'tradePong',
   tradeError = 'tradeError',
+
+  tradeEvent = 'tradeEvent',
+  tokenStatus = 'tokenStatus',
 }
 
 export type CabalTradeMessageHandler = (
