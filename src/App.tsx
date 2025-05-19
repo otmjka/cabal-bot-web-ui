@@ -12,6 +12,7 @@ import TradesTable from './TradesTable/TradesTable';
 import TradesShowDebug from './Debug/TradesShowDebug';
 import TokenStatusListShowDebug from './Debug/TokenStatusListShowDebug';
 import TokenTradeStatsShowDebug from './Debug/TokenTradeStatsShowDebug';
+import { TokenChart } from './uiKit/TokenChart';
 
 const App: Component = () => {
   useCabalService();
@@ -25,6 +26,10 @@ const App: Component = () => {
       <Show when={userSettings.apiKey} fallback={<UserSettings />}>
         <div>!!!</div>
       </Show>
+      <Show when={trades.trades.length > 0}>
+        <TokenChart />
+      </Show>
+
       <Show when={trades.trades.length > 0}>
         <TradesTable />
       </Show>

@@ -1,11 +1,7 @@
 import { createStore } from 'solid-js/store';
-import {
-  PoolKind,
-  TradeEvent,
-  TradeEventData,
-} from '../services/cabal/CabalRpc/cabal_pb';
+import { PoolKind, TradeEventData } from '../services/cabal/CabalRpc/cabal_pb';
 
-type TradeType =
+export type TradeType =
   | 'buy'
   | 'sell'
   | 'deposit'

@@ -2,18 +2,14 @@ import { createStore } from 'solid-js/store';
 import { TokenStatus } from '../services/cabal/CabalRpc/cabal_pb';
 
 type TradesStore = {
-  tokenStatusList: TokenStatus[];
+  tokenStatus: TokenStatus | undefined;
 };
 
 const initValue = {
-  tokenStatusList: [],
+  tokenStatus: undefined,
 };
 
 const [tokenStatusStore, setTokenStatusStore] =
   createStore<TradesStore>(initValue);
 
-const addTokenStatus = (item: TokenStatus) => {
-  setTokenStatusStore('tokenStatusList', (prev) => [...prev, item]);
-};
-
-export { tokenStatusStore, setTokenStatusStore, addTokenStatus };
+export { tokenStatusStore, setTokenStatusStore };

@@ -8,11 +8,12 @@ import {
 
 import { trades } from '../stores/trades';
 import { columns } from './columns';
+import { tokenTradeStatsStore } from '../stores/tokenTradeStatsStore';
 
 const TradesTable = () => {
   const table = createSolidTable({
     get data() {
-      return trades.trades;
+      return [...trades.trades].reverse();
     },
     columns,
     getCoreRowModel: getCoreRowModel(),

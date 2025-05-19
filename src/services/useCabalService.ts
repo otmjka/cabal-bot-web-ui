@@ -10,7 +10,10 @@ import {
   TradeEvent,
 } from './cabal/CabalRpc/cabal_pb';
 import { addTrade } from '../stores/trades';
-import { addTokenStatus } from '../stores/tokenStatusStore';
+import {
+  addTokenStatus,
+  setTokenStatusStore,
+} from '../stores/tokenStatusStore';
 import { addTokenTradeStats } from '../stores/tokenTradeStatsStore';
 
 let cabal: CabalService | null = null;
@@ -55,7 +58,7 @@ export function useCabalService() {
 
       const handleTradeTokenStatus = (eventValue: TokenStatus) => {
         const tokenStatus = eventValue.value.value as TokenStatus;
-        addTokenStatus(tokenStatus);
+        setTokenStatusStore('tokenStatus', tokenStatus);
       };
 
       cabal.on(
