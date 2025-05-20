@@ -67,7 +67,6 @@ export default function TokenChart() {
     }
 
     const data = chartData();
-    console.log('#####', data);
 
     // Prepare data for uPlot
     const timestamps = data.map((d) => d.timestamp);
@@ -76,7 +75,7 @@ export default function TokenChart() {
     // Set the min/max values for better visualization
     const minPrice = Math.min(...prices) * 0.99;
     const maxPrice = Math.max(...prices) * 1.01;
-
+    console.log('####', minPrice, maxPrice, maxPrice - minPrice);
     const chartInstance = getChartInstance({
       tokenDecimals,
       width: chartElementValue.clientWidth,

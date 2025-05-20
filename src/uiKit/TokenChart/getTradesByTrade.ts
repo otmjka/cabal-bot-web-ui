@@ -12,7 +12,7 @@ export const getTradesByTrade = ({
   return trades.map((trade) => ({
     timestamp: Math.floor(trade.timestamp / 1000),
     price: calculatePrice({ trade, baseDecimals }),
-    volume: Number(trade.amountSol),
+    volume: Number(trade.amountSol) / calculatePrice({ trade, baseDecimals }),
     type: trade.type,
   }));
 };

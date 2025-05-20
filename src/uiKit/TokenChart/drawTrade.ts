@@ -14,12 +14,18 @@ export const drawTrade = ({
   u: uPlot;
   tf: TimeFrames;
 }) => {
-  const x = u.valToPos(trade.timestamp, 'x');
-  const y = u.valToPos(trade.price, 'y');
+  const x = u.valToPos(trade.timestamp, 'x', true);
+  const y = u.valToPos(trade.price, 'y', true);
 
+  let totalVolume = 0;
+  if (trade.volumes) {
+    for (let singleVolume of trade.volumes) {
+      totalVolume += singleVolume;
+    }
+  }
   const size = getSize({
     selectedTimeframe: tf,
-    volume: trade.volume,
+    volume: trade.volume || totalVolume,
     totalVolume: Number(trade.totalVolume),
   });
 

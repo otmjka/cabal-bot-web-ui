@@ -12,6 +12,7 @@ export enum CabalTradeStreamMessages {
 
   streamMessage = 'streamMessage',
 
+  tradePing = 'ping',
   tradePong = 'pong',
   tradeError = 'tradeError',
 

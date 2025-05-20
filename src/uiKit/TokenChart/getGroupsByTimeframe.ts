@@ -7,7 +7,7 @@ type Group = {
   buy: bigint;
   sell: bigint;
   price: number;
-  volumes: Array<bigint>;
+  volumes: Array<number>;
 };
 
 export const getGroupsByTimeframe = ({
@@ -23,8 +23,9 @@ export const getGroupsByTimeframe = ({
   const timeframeSeconds = getTimeFrameSeconds(timeframe);
 
   trades.forEach((trade) => {
+    const timestampSec = Math.floor(trade.timestamp / 1000);
     const timeGroup =
-      Math.floor(trade.timestamp / timeframeSeconds) * timeframeSeconds;
+      Math.floor(timestampSec / timeframeSeconds) * timeframeSeconds;
     if (!grouped[timeGroup]) {
       grouped[timeGroup] = {
         buy: 0n,
@@ -42,7 +43,9 @@ export const getGroupsByTimeframe = ({
 
     // Use the last price in the timeframe as the representative price
     grouped[timeGroup].price = calculatePrice({ trade, baseDecimals });
-    grouped[timeGroup].volumes.push(trade.amountSol);
+    grouped[timeGroup].volumes.push(
+      Number(trade.amountSol) / calculatePrice({ trade, baseDecimals }),
+    );
   });
 
   return Object.entries(grouped).map(([timestamp, data]) => ({

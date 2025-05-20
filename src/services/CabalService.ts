@@ -178,8 +178,7 @@ class CabalService extends EventEmitter {
         });
         break;
       case 'ping':
-        debugger;
-        this.emit(CabalTradeStreamMessages.ping, {
+        this.emit(CabalTradeStreamMessages.tradePing, {
           value: message.tradeEventResponseKind.value,
         });
         break;

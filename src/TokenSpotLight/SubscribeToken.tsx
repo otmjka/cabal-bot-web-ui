@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js';
 import { z } from 'zod';
 
 import { useSubscribeToken } from '../services/useCabalService';
-import { Button, Card, Input } from '../uiKit';
+import { Button, Input } from '../uiKit';
 
 const schema = z.object({
   apiKey: z.string().min(1, 'required'),
@@ -50,6 +50,5 @@ const SubscribeToken = () => {
     </form>
   );
 };
-// <div class="text-white">7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr</div>
 
 export default SubscribeToken;

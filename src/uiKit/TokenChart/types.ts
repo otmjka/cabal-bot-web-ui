@@ -11,6 +11,7 @@ export type SeriesItem = {
   timestamp: number;
   price: number;
   volume?: number;
+  volumes?: number[];
   type: TradeType;
   totalVolume?: bigint;
 };
