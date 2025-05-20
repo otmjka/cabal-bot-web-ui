@@ -7,6 +7,7 @@ import TokenTradeStatsShowDebug from '../Debug/TokenTradeStatsShowDebug';
 import { tokenStatusStore } from '../stores/tokenStatusStore';
 import { tokenTradeStatsStore } from '../stores/tokenTradeStatsStore';
 import TradeForm from './TradeForm';
+import { tradeEventsStore } from '../stores/tradeEventsStore';
 
 const TokenScreen = () => {
   return (
@@ -22,7 +23,15 @@ const TokenScreen = () => {
         </div>
 
         <div class="w-1/4 bg-green-300">
-          <TradeForm />
+          <Show
+            when={
+              tokenStatusStore.tokenStatus &&
+              tokenTradeStatsStore.tokenTradeStats &&
+              !!tradeEventsStore.trades.length
+            }
+          >
+            <TradeForm />
+          </Show>
           <TokenStatusListShowDebug />
           <TokenTradeStatsShowDebug />
         </div>

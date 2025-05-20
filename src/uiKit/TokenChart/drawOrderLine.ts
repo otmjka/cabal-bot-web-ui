@@ -7,7 +7,7 @@ export const drawOrderLine = ({
   ctx: CanvasRenderingContext2D;
   u: uPlot;
 }) => {
-  const orderPriceY = u.valToPos(orderPriceValue, 'y');
+  const orderPriceY = u.valToPos(orderPriceValue, 'y', true);
 
   ctx.save();
   ctx.strokeStyle = 'rgba(255, 165, 0, 0.8)';
@@ -19,8 +19,8 @@ export const drawOrderLine = ({
   ctx.stroke();
 
   // Add order price label
-  ctx.fillStyle = 'rgba(255, 165, 0, 1)';
-  ctx.font = '12px Arial';
+  ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+  ctx.font = '20px Arial';
   ctx.textAlign = 'left';
   ctx.fillText(
     // `Order: ${orderPriceValue.toFixed(10)}`,

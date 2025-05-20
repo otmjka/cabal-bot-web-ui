@@ -14,13 +14,13 @@ import { TimeFrames } from './types';
 import { tokenTradeStatsStore } from '../../stores/tokenTradeStatsStore';
 import { getChartData } from './getChartData';
 import { getChartInstance } from './getChartInstance';
+import { chartTradePriceStore } from '../../stores/chartTradePriceStore';
 
 export default function TokenChart() {
   const [chartElement, setChartElement] = createSignal<HTMLDivElement | null>(
     null,
   );
   const [chart, setChart] = createSignal<uPlot | null>(null);
-  const [orderPrice, setOrderPrice] = createSignal(null);
 
   const [selectedTimeframe, setSelectedTimeframe] = createSignal<TimeFrames>(
     TimeFrames.single,
@@ -74,15 +74,16 @@ export default function TokenChart() {
 
     // Set the min/max values for better visualization
     const minPrice = Math.min(...prices) * 0.99;
-    const maxPrice = Math.max(...prices) * 1.01;
-    console.log('####', minPrice, maxPrice, maxPrice - minPrice);
+    const maxPrice =
+      Math.max(...prices, chartTradePriceStore.price || 0) * 1.01;
+
     const chartInstance = getChartInstance({
       tokenDecimals,
       width: chartElementValue.clientWidth,
       range: [minPrice, maxPrice],
       data: [timestamps, prices],
       tf: selectedTimeframe(),
-      orderPriceValue: orderPrice(),
+      orderPriceValue: chartTradePriceStore.price,
       tradeSeries: data,
       chartElement: chartElementValue,
     });
@@ -103,6 +104,7 @@ export default function TokenChart() {
 
   // Re-render chart when timeframe changes
   createEffect(() => {
+    chartTradePriceStore.price;
     chartData();
     selectedTimeframe();
     if (chartElement()) {
