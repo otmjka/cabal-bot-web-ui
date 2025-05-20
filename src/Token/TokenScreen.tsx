@@ -13,22 +13,23 @@ const TokenScreen = () => {
   // console.log(userSettings.apiKey, tradeEventsStore.trades);
   return (
     <div class="flex flex-1">
-      <div class="w-3/4 flex flex-col">
-        <Show when={tokenStatusStore.tokenStatus}>
+      <Show
+        when={
+          tokenTradeStatsStore.tokenTradeStats && tokenStatusStore.tokenStatus
+        }
+      >
+        <div class="w-3/4 flex flex-col">
           <TokenChart />
           <TradesTable />
-        </Show>
-      </div>
+        </div>
 
-      <div class="w-1/4 bg-green-300">
-        {/* <TradesShowDebug /> */}
-        <Show when={tokenStatusStore.tokenStatus}>
+        <div class="w-1/4 bg-green-300">
+          {/* <TradesShowDebug /> */}
           <TokenStatusListShowDebug />
-        </Show>
-        <Show when={tokenTradeStatsStore.tokenTradeStats}>
+
           <TokenTradeStatsShowDebug />
-        </Show>
-      </div>
+        </div>
+      </Show>
     </div>
   );
 };

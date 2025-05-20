@@ -1,4 +1,4 @@
-import { TradeRecord } from '../../stores/tradeEventsStore';
+import { TradeRecord, TradeType } from '../../types';
 import { calculatePrice } from '../../utils/ammPrice';
 import { getTimeFrameSeconds } from './getTimeFrameSeconds';
 import { TimeFrames } from './types';
@@ -9,11 +9,6 @@ type Group = {
   price: number;
   volumes: Array<bigint>;
 };
-
-enum TradeType {
-  buy = 'buy',
-  sell = 'sell',
-}
 
 export const getGroupsByTimeframe = ({
   trades,

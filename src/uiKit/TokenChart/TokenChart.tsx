@@ -67,16 +67,18 @@ export default function TokenChart() {
     }
 
     const data = chartData();
+    console.log('#####', data);
 
     // Prepare data for uPlot
     const timestamps = data.map((d) => d.timestamp);
-    const prices = data.map((d) => Number(d.price)); // TODO:
+    const prices = data.map((d) => d.price);
 
     // Set the min/max values for better visualization
     const minPrice = Math.min(...prices) * 0.99;
     const maxPrice = Math.max(...prices) * 1.01;
 
     const chartInstance = getChartInstance({
+      tokenDecimals,
       width: chartElementValue.clientWidth,
       range: [minPrice, maxPrice],
       data: [timestamps, prices],
@@ -149,21 +151,6 @@ export default function TokenChart() {
         ref={setChartElement}
         class="w-full h-[400px] bg-white border rounded"
       ></div>
-
-      <div class="flex gap-6 mt-2">
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-full bg-green-500 bg-opacity-60 border border-white"></div>
-          <span class="text-sm">Buy Trades</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-full bg-red-500 bg-opacity-60 border border-white"></div>
-          <span class="text-sm">Sell Trades</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-5 h-0.5 bg-orange-400 border-t border-dashed border-orange-500"></div>
-          <span class="text-sm">Order Price</span>
-        </div>
-      </div>
     </div>
   );
 }

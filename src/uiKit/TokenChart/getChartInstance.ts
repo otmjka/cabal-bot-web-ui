@@ -4,6 +4,7 @@ import { drawOrderLine } from './drawOrderLine';
 import { drawTrade } from './drawTrade';
 
 export const getChartInstance = ({
+  tokenDecimals,
   width,
   range,
   data,
@@ -13,6 +14,7 @@ export const getChartInstance = ({
   orderPriceValue,
   tradeSeries,
 }: {
+  tokenDecimals: number;
   width: number;
   range: [number, number];
   data: [number[], number[]];
@@ -24,30 +26,29 @@ export const getChartInstance = ({
 }) => {
   const now = new Date();
 
-  // начало часа
-  const startOfHour = new Date(now);
-  startOfHour.setMinutes(0, 0, 0);
+  const minus30 = new Date(now.getTime() - 30 * 60 * 1000);
+  const left = minus30.getTime() / 1000;
 
-  // конец часа
-  const endOfHour = new Date(now);
-  endOfHour.setMinutes(59, 59, 999);
+  const plus30 = new Date(now.getTime() + 30 * 60 * 1000);
+  const right = plus30.getTime() / 1000;
 
-  // преобразуем в timestamp (в секундах, потому что uPlot использует секунды, а не миллисекунды)
-  const range1h = [startOfHour.getTime() / 1000, endOfHour.getTime() / 1000];
   return new uPlot(
     {
       width,
       height: 400,
-      cursor: { y: false },
+      // cursor: { y: false },
+      cursor: {
+        y: true,
+      },
       scales: {
         x: {
           time: true,
-          range: () => [
-            startOfHour.getTime() / 1000,
-            endOfHour.getTime() / 1000,
-          ],
+          range: () => [left, right],
         },
-        y: { auto: true },
+        y: {
+          // auto: true
+          range: () => range,
+        },
       },
       series: [
         { label: 'Time' },
@@ -59,11 +60,9 @@ export const getChartInstance = ({
       ],
       axes: [
         {
-          label: 'Time',
           grid: { width: 1 / devicePixelRatio, stroke: '#EEEEEE' },
         },
         {
-          label: 'Price',
           grid: { width: 1 / devicePixelRatio, stroke: '#EEEEEE' },
         },
       ],
