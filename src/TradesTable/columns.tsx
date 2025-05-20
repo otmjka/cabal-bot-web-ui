@@ -15,17 +15,6 @@ export const columns = (tokenDecimals: number): ColumnDef<TradeRecord>[] => [
     cell: (info) => <i>{info.getValue<string>()}</i>,
     header: () => <span>amountSol</span>,
   },
-  // {
-  //   accessorFn: (row) => row.baseLiq.toString(),
-  //   id: 'baseLiq',
-  //   cell: (info) => <i>{info.getValue<string>()}</i>,
-  //   header: () => <span>baseLiq</span>,
-  // },
-  // {
-  //   accessorKey: 'quoteLiq',
-  //   accessorFn: (row) => row.quoteLiq.toString(),
-  //   header: () => <span>quoteLiq</span>,
-  // },
   {
     accessorFn: (row) =>
       calculateAssetPrice({
@@ -50,7 +39,6 @@ export const columns = (tokenDecimals: number): ColumnDef<TradeRecord>[] => [
     cell: (info) => <i>{info.getValue<string>()}</i>,
     header: () => <span>Amount</span>,
   },
-
   {
     accessorFn: (row) => PoolKind[row.poolKind],
     accessorKey: 'poolKind',
